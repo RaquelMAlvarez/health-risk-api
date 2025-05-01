@@ -1,8 +1,10 @@
+# app/main.py
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Literal
 
-from app.logic import predict_risk  # Importamos la lógica que escribirás en logic.py
+from app.logic import predict_risk
 
 app = FastAPI(title="Health Risk Predictor API")
 
@@ -30,3 +32,4 @@ def predict_risk_endpoint(data: RiskInput):
         return {"risk_level": risk_level, "recommendation": recommendation}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
