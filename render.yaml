@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: healthrisk-api
+    plan: free
+    runtime: python
+    region: oregon
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "bash app/start.sh"
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:///./patients.db
+    branch: main
+
