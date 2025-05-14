@@ -1,13 +1,17 @@
 # app/main.py
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from pydantic import BaseModel
 from typing import Literal
+from datetime import timedelta
 
 from app.logic import predict_risk
-from app.database import SessionLocal, Patient, init_db  # <-- Mueve esto arriba
+from app.database import SessionLocal, Patient, init_db
+from app.auth import authenticate_user, create_access_token, get_current_user
 
 app = FastAPI(title="Health Risk Predictor API")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Input model
 class RiskInput(BaseModel):
@@ -34,7 +38,6 @@ def predict_risk_endpoint(data: RiskInput):
         return {"risk_level": risk_level, "recommendation": recommendation}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # Endpoint: POST /patients
 @app.post("/patients")
@@ -66,10 +69,9 @@ def save_patient(data: RiskInput):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-# Endpoint: GET /patients
+# Endpoint: GET /patients (protegido con JWT)
 @app.get("/patients")
-def get_patients():
+def get_patients(user: dict = Depends(get_current_user)):
     try:
         db = SessionLocal()
         patients = db.query(Patient).all()
@@ -90,6 +92,16 @@ def get_patients():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# Endpoint: /token
+@app.post("/token")
+def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    if not authenticate_user(form_data.username, form_data.password):
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+    access_token = create_access_token(
+        data={"sub": form_data.username},
+        expires_delta=timedelta(minutes=60)
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
 
 # Crear base de datos si no existe
 init_db()
