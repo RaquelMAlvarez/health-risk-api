@@ -1,19 +1,17 @@
 # app/main.py
 
-#incluir /token
-from fastapi.security import OAuth2PasswordRequestForm
-from app.auth import authenticate_user, create_access_token, get_current_user
-from datetime import timedelta
-from fastapi import Depends
-
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from pydantic import BaseModel
 from typing import Literal
+from datetime import timedelta
 
 from app.logic import predict_risk
-from app.database import SessionLocal, Patient, init_db  # <-- Mueve esto arriba
+from app.database import SessionLocal, Patient, init_db
+from app.auth import authenticate_user, create_access_token, get_current_user
 
 app = FastAPI(title="Health Risk Predictor API")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Input model
 class RiskInput(BaseModel):
@@ -40,7 +38,6 @@ def predict_risk_endpoint(data: RiskInput):
         return {"risk_level": risk_level, "recommendation": recommendation}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # Endpoint: POST /patients
 @app.post("/patients")
@@ -72,10 +69,9 @@ def save_patient(data: RiskInput):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-# Endpoint: GET /patients
+# Endpoint: GET /patients (protegido con JWT)
 @app.get("/patients")
-def get_patients():
+def get_patients(user: dict = Depends(get_current_user)):
     try:
         db = SessionLocal()
         patients = db.query(Patient).all()
@@ -96,11 +92,7 @@ def get_patients():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-# Crear base de datos si no existe
-init_db()
-
-#nuevo endpoint auth
+# Endpoint: /token
 @app.post("/token")
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if not authenticate_user(form_data.username, form_data.password):
@@ -111,24 +103,5 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-#proteger endpoints
-@app.get("/patients")
-def get_patients(user: dict = Depends(get_current_user)):
-    # Solo accesible si el token es válido
-    db = SessionLocal()
-    patients = db.query(Patient).all()
-    db.close()
-    return [
-        {
-            "id": p.id,
-            "age": p.age,
-            "smoking_history": p.smoking_history,
-            "pollution_level": p.pollution_level,
-            "genetic_risk": p.genetic_risk,
-            "risk_level": p.risk_level,
-            "recommendation": p.recommendation
-        }
-        for p in patients
-    ]
-
-
+# Crear base de datos si no existe
+init_db()
