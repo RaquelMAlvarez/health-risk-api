@@ -105,3 +105,8 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 # Crear base de datos si no existe
 init_db()
+
+#Para evitar el 404 Not Found cuando se accede a la raíz (/) de API
+@app.get("/")
+def root():
+    return {"message": "API is running. Visit /docs for documentation."}
