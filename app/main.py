@@ -1,5 +1,11 @@
 # app/main.py
 
+#incluir /token
+from fastapi.security import OAuth2PasswordRequestForm
+from app.auth import authenticate_user, create_access_token, get_current_user
+from datetime import timedelta
+from fastapi import Depends
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Literal
@@ -93,3 +99,36 @@ def get_patients():
 
 # Crear base de datos si no existe
 init_db()
+
+#nuevo endpoint auth
+@app.post("/token")
+def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    if not authenticate_user(form_data.username, form_data.password):
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
+    access_token = create_access_token(
+        data={"sub": form_data.username},
+        expires_delta=timedelta(minutes=60)
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+#proteger endpoints
+@app.get("/patients")
+def get_patients(user: dict = Depends(get_current_user)):
+    # Solo accesible si el token es válido
+    db = SessionLocal()
+    patients = db.query(Patient).all()
+    db.close()
+    return [
+        {
+            "id": p.id,
+            "age": p.age,
+            "smoking_history": p.smoking_history,
+            "pollution_level": p.pollution_level,
+            "genetic_risk": p.genetic_risk,
+            "risk_level": p.risk_level,
+            "recommendation": p.recommendation
+        }
+        for p in patients
+    ]
+
+
