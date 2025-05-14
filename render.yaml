@@ -9,5 +9,6 @@ services:
     envVars:
       - key: DATABASE_URL
         value: sqlite:///./patients.db
-    branch: main
+    branch: feature/auth-jwt
+
 
