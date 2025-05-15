@@ -103,6 +103,48 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+# Endpoint: DELETE /patients/{patient_id}
+@app.delete("/patients/{patient_id}")
+def delete_patient(patient_id: int, user: dict = Depends(get_current_user)):
+    db = SessionLocal()
+    patient = db.query(Patient).filter(Patient.id == patient_id).first()
+    if not patient:
+        db.close()
+        raise HTTPException(status_code=404, detail="Patient not found")
+    db.delete(patient)
+    db.commit()
+    db.close()
+    return {"message": f"Patient with id {patient_id} deleted successfully"}
+
+
+# Endpoint: PUT /patients/{patient_id}
+@app.put("/patients/{patient_id}")
+def update_patient(patient_id: int, data: RiskInput, user: dict = Depends(get_current_user)):
+    db = SessionLocal()
+    patient = db.query(Patient).filter(Patient.id == patient_id).first()
+    if not patient:
+        db.close()
+        raise HTTPException(status_code=404, detail="Patient not found")
+
+    risk_level, recommendation = predict_risk(
+        age=data.age,
+        smoking_history=data.smoking_history,
+        pollution_level=data.pollution_level,
+        genetic_risk=data.genetic_risk
+    )
+
+    patient.age = data.age
+    patient.smoking_history = data.smoking_history
+    patient.pollution_level = data.pollution_level
+    patient.genetic_risk = data.genetic_risk
+    patient.risk_level = risk_level
+    patient.recommendation = recommendation
+
+    db.commit()
+    db.refresh(patient)
+    db.close()
+    return {"message": f"Patient with id {patient_id} updated successfully"}
+
 # Crear base de datos si no existe
 init_db()
 
