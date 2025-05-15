@@ -98,3 +98,84 @@ After deployment, the app is accessible via:
 API docs: https://healthrisk-api.onrender.com/docs
 
 Test /predict-risk or /patients endpoints using Swagger UI.
+
+This API predicts lung cancer risk based on combined genetic, environmental, and lifestyle factors. Built with FastAPI and secured using JWT authentication, it supports full CRUD operations for managing patient data.
+
+🚀 Features
+
+Risk prediction based on:
+
+Age
+
+Smoking history
+
+Pollution level
+
+Genetic risk indicators
+
+Personalized recommendations
+
+Data persistence with SQLite
+
+JWT-based authentication
+
+Complete CRUD functionality for patient records
+
+📋 Endpoints
+
+🔐 Authentication
+
+POST /token – Obtain JWT token (required for protected endpoints)
+
+🧠 Prediction
+
+POST /predict-risk – Predicts a patient’s lung cancer risk level
+
+🗃️ Patient Management (CRUD, protected)
+
+POST /patients – Create a new patient record
+
+GET /patients – Retrieve all patient records
+
+PUT /patients/{id} – Update an existing patient
+
+DELETE /patients/{id} – Delete a patient by ID
+
+🔑 How to Authenticate
+
+Send a POST request to /token with:
+
+username=admin
+
+password=admin123
+
+
+2.Install requirements:
+pip install -r requirements.txt
+
+3.Run the API:
+uvicorn app.main:app --reload
+
+4.Open Swagger UI:
+http://127.0.0.1:8000/docs
+
+## 🌐 Deployment
+
+- Render: https://healthrisk-api.onrender.com
+- Swagger Docs: https://healthrisk-api.onrender.com/docs
+
+---
+
+## 🧰 Technologies
+- Python
+- FastAPI
+- SQLAlchemy
+- SQLite
+- JWT (`python-jose`)
+- Swagger/OpenAPI
+
+---
+
+## ✅ Status
+Fully functional API with secure authentication and CRUD operations.
+Next step: connect with a React-based frontend.
