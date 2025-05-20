@@ -152,3 +152,14 @@ init_db()
 @app.get("/")
 def root():
     return {"message": "API is running. Visit /docs for documentation."}
+
+#configurar CORS en FastAPI.React (puerto 3000) y FastAPI (puerto 8000).
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Puedes restringirlo a ["http://localhost:3000"] si prefieres
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
