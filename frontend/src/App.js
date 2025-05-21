@@ -34,6 +34,25 @@ function App() {
   e.preventDefault();
   setStatusMessage('Send Data...');
 
+  // Validación básica: campos vacíos
+  if (
+    !formData.age ||
+    !formData.smoking_history ||
+    !formData.pollution_level ||
+    !formData.genetic_risk
+  ) {
+    setStatusMessage("Please fill in all the fields before submitting.");
+    return;
+  }
+
+  // Validación de edad positiva
+  const ageNumber = Number(formData.age);
+  if (isNaN(ageNumber) || ageNumber <= 0) {
+    setStatusMessage("Age must be a positive number.");
+    return;
+  }
+   
+  //fetch call 
   try {
     const response = await fetch("http://127.0.0.1:8000/patients", {
       method: "POST",
@@ -64,8 +83,6 @@ function App() {
       <p><strong>API status:</strong> {apiStatus}</p>
       <p style={{ color: statusMessage.includes('Error') ? 'red' : 'green' }}>
       <strong>{statusMessage}</strong></p>
-
-      
 
 
       <form onSubmit={handleSubmit}>
