@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 function App() {
   const [apiStatus, setApiStatus] = useState('Checking...');
+  const [statusMessage, setStatusMessage] = useState('');
   const [formData, setFormData] = useState({
     age: '',
     smoking_history: '',
@@ -28,16 +29,44 @@ function App() {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Aquí luego haremos POST a /patients
-  };
+  //Preparar la función handleSubmit para hacer un POST
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setStatusMessage('Send Data...');
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/patients", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(formData)
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      setStatusMessage(`Patient successfully saved. ID: ${data.id}`);
+    } else {
+      setStatusMessage(`Server error: ${data.detail}`);
+    }
+
+  } catch (error) {
+    console.error("Error connecting to the API:", error);
+    setStatusMessage("Could not connect to the server.");
+  }
+};
+
 
   return (
     <div style={{ padding: '2rem' }}>
       <h1>Health Risk Predictor</h1>
       <p><strong>API status:</strong> {apiStatus}</p>
+      <p style={{ color: statusMessage.includes('Error') ? 'red' : 'green' }}>
+      <strong>{statusMessage}</strong></p>
+
+      
+
 
       <form onSubmit={handleSubmit}>
         <label>
