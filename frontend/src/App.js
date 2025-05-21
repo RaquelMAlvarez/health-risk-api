@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 function App() {
   const [apiStatus, setApiStatus] = useState('Checking...');
   const [statusMessage, setStatusMessage] = useState('');
+  const [prediction, setPrediction] = useState(null);
+
   const [formData, setFormData] = useState({
     age: '',
     smoking_history: '',
@@ -29,30 +31,56 @@ function App() {
     });
   };
 
-  //Preparar la función handleSubmit para hacer un POST
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  setStatusMessage('Send Data...');
-
-  // Validación básica: campos vacíos
+  // define handlePredict a nivel superior del componente
+const handlePredict = async () => {
   if (
     !formData.age ||
     !formData.smoking_history ||
     !formData.pollution_level ||
     !formData.genetic_risk
   ) {
-    setStatusMessage("Please fill in all the fields before submitting.");
+    
+    setStatusMessage("Please fill in all fields before predicting.");
     return;
   }
 
-  // Validación de edad positiva
   const ageNumber = Number(formData.age);
   if (isNaN(ageNumber) || ageNumber <= 0) {
     setStatusMessage("Age must be a positive number.");
     return;
   }
-   
-  //fetch call 
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/predict-risk", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(formData)
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      setPrediction(data);
+      setStatusMessage(""); // limpia mensaje anterior
+    } else {
+      setStatusMessage(`Prediction failed: ${data.detail?.toString?.() || JSON.stringify(data.detail)}`);
+      setPrediction(null);
+    }
+
+  } catch (error) {
+    console.error("Error connecting to the API:", error);
+    setStatusMessage("Could not connect to the server.");
+    setPrediction(null);
+  }
+};
+
+// define handleSubmit como otra función aparte
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setStatusMessage('Sending patient data...');
+
   try {
     const response = await fetch("http://127.0.0.1:8000/patients", {
       method: "POST",
@@ -65,11 +93,17 @@ function App() {
     const data = await response.json();
 
     if (response.ok) {
-      setStatusMessage(`Patient successfully saved. ID: ${data.id}`);
+      setStatusMessage(`Patient saved successfully. ID: ${data.id}`);
+      setFormData({
+        age: '',
+        smoking_history: '',
+        pollution_level: '',
+        genetic_risk: ''
+      });
+      setPrediction(null);
     } else {
       setStatusMessage(`Server error: ${data.detail}`);
     }
-
   } catch (error) {
     console.error("Error connecting to the API:", error);
     setStatusMessage("Could not connect to the server.");
@@ -77,6 +111,7 @@ function App() {
 };
 
 
+//form 
   return (
     <div style={{ padding: '2rem' }}>
       <h1>Health Risk Predictor</h1>
@@ -84,6 +119,12 @@ function App() {
       <p style={{ color: statusMessage.includes('Error') ? 'red' : 'green' }}>
       <strong>{statusMessage}</strong></p>
 
+     {prediction && (
+  <div>
+    <p><strong>Risk Level:</strong> {prediction.risk_level}</p>
+    <p><strong>Recommendation:</strong> {prediction.recommendation}</p>
+  </div>
+)}
 
       <form onSubmit={handleSubmit}>
         <label>
@@ -106,10 +147,10 @@ function App() {
             onChange={handleChange}
             required
           >
-            <option value="">--Select--</option>
             <option value="never smoked">Never Smoked</option>
-            <option value="former">Former</option>
-            <option value="current">Current</option>
+            <option value="former smoker">Former Smoker</option>
+            <option value="current smoker">Current Smoker</option>
+
           </select>
         </label>
         <br /><br />
@@ -122,10 +163,10 @@ function App() {
             onChange={handleChange}
             required
           >
-            <option value="">--Select--</option>
             <option value="low">Low</option>
-            <option value="moderate">Moderate</option>
+            <option value="medium">Medium</option>
             <option value="high">High</option>
+
           </select>
         </label>
         <br /><br />
@@ -144,8 +185,8 @@ function App() {
           </select>
         </label>
         <br /><br />
-
         <button type="submit">Submit Patient</button>
+        <button type="button" onClick={handlePredict}>Predict Risk</button>
       </form>
     </div>
   );
