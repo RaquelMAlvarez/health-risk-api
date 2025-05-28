@@ -1,4 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Container, Form, Button, Table, Alert } from 'react-bootstrap';
+
+
+
+
 
 function App() {
   const [apiStatus, setApiStatus] = useState('Checking...');
@@ -107,7 +113,7 @@ const handleSubmit = async (e) => {
         pollution_level: '',
         genetic_risk: ''
       });
-      setPrediction(null);
+      fetchPatients();//update the table after register patients
     } else {
       setStatusMessage(`Server error: ${data.detail}`);
     }
@@ -187,107 +193,129 @@ const deletePatient = async (id) => {
 };
 
 
+ //componentes de React-Bootstrap
+return (
+  <Container className="mt-4">
+    <h1 className="mb-4">Health Risk Predictor</h1>
 
+    <Alert variant={
+      apiStatus.includes('error') || apiStatus.includes('Could not')
+        ? 'danger'
+        : 'success'
+    }>
+      <strong>API status:</strong> {apiStatus}
+    </Alert>
 
-//form, label and boton
-  return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Health Risk Predictor</h1>
-      <p><strong>API status:</strong> {apiStatus}</p>
-      <p style={{ color: statusMessage.includes('Error') ? 'red' : 'green' }}>
-      <strong>{statusMessage}</strong></p>
+    {statusMessage && (
+      <Alert
+        variant={statusMessage.includes('Error') || statusMessage.includes('fail') ? 'danger' : 'info'}
+      >
+        <strong>{statusMessage}</strong>
+      </Alert>
+    )}
 
-    <div>
-      <h2>Login</h2>
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={e => setUsername(e.target.value)}
-      />
-      <br />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-      />
-      <br />
-      <button onClick={handleLogin}>Login</button>
-      <p><strong>{statusMessage}</strong></p>
+  <div>
+  <Form className="mb-4">
+  <h2>Login</h2>
+
+  <Form.Group className="mb-3" controlId="formUsername">
+    <Form.Label>Username</Form.Label>
+    <Form.Control
+      type="text"
+      placeholder="Enter username"
+      value={username}
+      onChange={(e) => setUsername(e.target.value)}
+    />
+  </Form.Group>
+
+  <Form.Group className="mb-3" controlId="formPassword">
+    <Form.Label>Password</Form.Label>
+    <Form.Control
+      type="password"
+      placeholder="Enter password"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+    />
+  </Form.Group>
+
+  <Button variant="primary" onClick={handleLogin}>
+    Login
+  </Button>
+</Form>
     </div>
 
     {prediction && (
-  <div>
-    <p><strong>Risk Level:</strong> {prediction.risk_level}</p>
-    <p><strong>Recommendation:</strong> {prediction.recommendation}</p>
-  </div>
-)}
+      <div className="mt-4">
+        <p><strong>Risk Level:</strong> {prediction.risk_level}</p>
+        <p><strong>Recommendation:</strong> {prediction.recommendation}</p>
+      </div>
+    )}
 
-    <form onSubmit={handleSubmit}>
-        <label>
-          Age:
-          <input
-            type="number"
-            name="age"
-            value={formData.age}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <br /><br />
+    <h2 className="mt-4">Submit Patient</h2>
+    <Form onSubmit={handleSubmit}>
+      <Form.Group className="mb-3">
+        <Form.Label>Age:</Form.Label>
+        <Form.Control
+          type="number"
+          name="age"
+          value={formData.age}
+          onChange={handleChange}
+          required
+        />
+      </Form.Group>
 
-        <label>
-          Smoking History:
-          <select
-            name="smoking_history"
-            value={formData.smoking_history}
-            onChange={handleChange}
-            required
-          >
-            <option value="never smoked">Never Smoked</option>
-            <option value="former smoker">Former Smoker</option>
-            <option value="current smoker">Current Smoker</option>
-        </select>
-        </label>
-        <br /><br />
+      <Form.Group className="mb-3">
+        <Form.Label>Smoking History:</Form.Label>
+        <Form.Select
+          name="smoking_history"
+          value={formData.smoking_history}
+          onChange={handleChange}
+          required
+        >
+          <option value="">--Select--</option>
+          <option value="never smoked">Never Smoked</option>
+          <option value="former smoker">Former Smoker</option>
+          <option value="current smoker">Current Smoker</option>
+        </Form.Select>
+      </Form.Group>
 
-        <label>
-          Pollution Level:
-          <select
-            name="pollution_level"
-            value={formData.pollution_level}
-            onChange={handleChange}
-            required
-          >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
-        </label>
-        <br /><br />
+      <Form.Group className="mb-3">
+        <Form.Label>Pollution Level:</Form.Label>
+        <Form.Select
+          name="pollution_level"
+          value={formData.pollution_level}
+          onChange={handleChange}
+          required
+        >
+          <option value="">--Select--</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </Form.Select>
+      </Form.Group>
 
-        <label>
-          Genetic Risk:
-          <select
-            name="genetic_risk"
-            value={formData.genetic_risk}
-            onChange={handleChange}
-            required
-          >
-            <option value="">--Select--</option>
-            <option value="positive">Positive</option>
-            <option value="negative">Negative</option>
-          </select>
-        </label>
-        <br /><br />
+      <Form.Group className="mb-3">
+        <Form.Label>Genetic Risk:</Form.Label>
+        <Form.Select
+          name="genetic_risk"
+          value={formData.genetic_risk}
+          onChange={handleChange}
+          required
+        >
+          <option value="">--Select--</option>
+          <option value="positive">Positive</option>
+          <option value="negative">Negative</option>
+        </Form.Select>
+      </Form.Group>
 
-        <button type="submit">Submit Patient</button>
-        <button type="button" onClick={handlePredict}>Predict Risk</button>
+      <Button type="submit" variant="success" className="me-2">Submit Patient</Button>
+      <Button type="button" variant="warning" onClick={handlePredict}>Predict Risk</Button>
+    </Form>
 
-    <h2>Pacientes Registrados</h2>
-      <table border="1" cellPadding="6">
-    <thead>
+<div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+<h2 className="mt-5">Pacientes Registrados</h2>
+  <Table striped bordered hover responsive size="sm" className="text-center">
+  <thead className="table-dark">
     <tr>
       <th>ID</th>
       <th>Age</th>
@@ -299,8 +327,7 @@ const deletePatient = async (id) => {
       <th>Action</th>
     </tr>
   </thead>
-  <tbody>
-
+<tbody>
     {patients.map(p => (
       <tr key={p.id}>
         <td>{p.id}</td>
@@ -311,16 +338,23 @@ const deletePatient = async (id) => {
         <td>{p.risk_level}</td>
         <td>{p.recommendation}</td>
         <td>
-          <button onClick={() => deletePatient(p.id)}>Eliminar</button>
+          <Button
+            variant="outline-danger"
+            size="sm"
+            onClick={() => deletePatient(p.id)}
+          >
+            Eliminar
+          </Button>
         </td>
       </tr>
     ))}
   </tbody>
-</table>
+</Table>
+</div>
+  </Container>
+  
+);
 
-  </form>
-    </div>
-  );
 }
 
 export default App;
