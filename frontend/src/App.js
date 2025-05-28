@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Container, Form, Button, Table, Alert } from 'react-bootstrap';
+import { Container,Card, Form, Button, Table, Alert } from 'react-bootstrap';
 
 
 
@@ -195,7 +195,9 @@ const deletePatient = async (id) => {
 
  //componentes de React-Bootstrap
 return (
-  <Container className="mt-4">
+  <div className="bg-light min-vh-100 p-4">
+    <div className="container"></div>
+
     <h1 className="mb-4">Health Risk Predictor</h1>
 
     <Alert variant={
@@ -204,8 +206,8 @@ return (
         : 'success'
     }>
       <strong>API status:</strong> {apiStatus}
-    </Alert>
-
+    </Alert> 
+  
     {statusMessage && (
       <Alert
         variant={statusMessage.includes('Error') || statusMessage.includes('fail') ? 'danger' : 'info'}
@@ -215,34 +217,49 @@ return (
     )}
 
   <div>
-  <Form className="mb-4">
-  <h2>Login</h2>
+  <Card style={{ maxWidth: '400px', margin: '2rem auto', padding: '1.5rem' }}>
+  <Card.Body>
+    <Card.Title className="mb-3 text-center">Login</Card.Title>
+    
+    <Form.Group className="mb-3" controlId="loginUsername">
+      <Form.Label>Username</Form.Label>
+      <Form.Control
+        type="text"
+        placeholder="Enter username"
+        value={username}
+        onChange={e => setUsername(e.target.value)}
+      />
+    </Form.Group>
 
-  <Form.Group className="mb-3" controlId="formUsername">
-    <Form.Label>Username</Form.Label>
-    <Form.Control
-      type="text"
-      placeholder="Enter username"
-      value={username}
-      onChange={(e) => setUsername(e.target.value)}
-    />
-  </Form.Group>
+    <Form.Group className="mb-3" controlId="loginPassword">
+      <Form.Label>Password</Form.Label>
+      <Form.Control
+        type="password"
+        placeholder="Enter password"
+        value={password}
+        onChange={e => setPassword(e.target.value)}
+      />
+    </Form.Group>
 
-  <Form.Group className="mb-3" controlId="formPassword">
-    <Form.Label>Password</Form.Label>
-    <Form.Control
-      type="password"
-      placeholder="Enter password"
-      value={password}
-      onChange={(e) => setPassword(e.target.value)}
-    />
-  </Form.Group>
+    <Button variant="primary" onClick={handleLogin} className="w-100">
+      Login
+    </Button>
 
-  <Button variant="primary" onClick={handleLogin}>
-    Login
-  </Button>
-</Form>
+    {statusMessage && (
+      <Alert
+        className="mt-3"
+        variant={statusMessage.toLowerCase().includes('error') ? 'danger' : 'success'}
+      >
+        {statusMessage}
+      </Alert>
+    )}
+  </Card.Body>
+</Card>
     </div>
+
+  <Card style={{ maxWidth: '600px', margin: '2rem auto', padding: '1.5rem' }}>
+  <Card.Body>
+    <Card.Title className="mb-4 text-center">Register Patient</Card.Title>
 
     {prediction && (
       <div className="mt-4">
@@ -250,11 +267,10 @@ return (
         <p><strong>Recommendation:</strong> {prediction.recommendation}</p>
       </div>
     )}
-
-    <h2 className="mt-4">Submit Patient</h2>
+    
     <Form onSubmit={handleSubmit}>
-      <Form.Group className="mb-3">
-        <Form.Label>Age:</Form.Label>
+      <Form.Group className="mb-3" controlId="formAge">
+        <Form.Label>Age</Form.Label>
         <Form.Control
           type="number"
           name="age"
@@ -264,8 +280,8 @@ return (
         />
       </Form.Group>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Smoking History:</Form.Label>
+      <Form.Group className="mb-3" controlId="formSmoking">
+        <Form.Label>Smoking History</Form.Label>
         <Form.Select
           name="smoking_history"
           value={formData.smoking_history}
@@ -279,8 +295,8 @@ return (
         </Form.Select>
       </Form.Group>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Pollution Level:</Form.Label>
+      <Form.Group className="mb-3" controlId="formPollution">
+        <Form.Label>Pollution Level</Form.Label>
         <Form.Select
           name="pollution_level"
           value={formData.pollution_level}
@@ -294,8 +310,8 @@ return (
         </Form.Select>
       </Form.Group>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Genetic Risk:</Form.Label>
+      <Form.Group className="mb-4" controlId="formGeneticRisk">
+        <Form.Label>Genetic Risk</Form.Label>
         <Form.Select
           name="genetic_risk"
           value={formData.genetic_risk}
@@ -308,14 +324,20 @@ return (
         </Form.Select>
       </Form.Group>
 
-      <Button type="submit" variant="success" className="me-2">Submit Patient</Button>
-      <Button type="button" variant="warning" onClick={handlePredict}>Predict Risk</Button>
+      <div className="d-flex justify-content-between">
+        <Button type="submit" variant="success">Submit Patient</Button>
+        <Button type="button" variant="warning" onClick={handlePredict}>Predict Risk</Button>
+      </div>
     </Form>
+  </Card.Body>
+</Card>
 
+   {/*If the board becomes too long or wide,can make it more manageable. */}
 <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-<h2 className="mt-5">Pacientes Registrados</h2>
-  <Table striped bordered hover responsive size="sm" className="text-center">
-  <thead className="table-dark">
+
+<h2 className="mt-5">Registered Patients</h2>
+<Table striped bordered hover responsive className="mt-3">
+  <thead>
     <tr>
       <th>ID</th>
       <th>Age</th>
@@ -327,7 +349,7 @@ return (
       <th>Action</th>
     </tr>
   </thead>
-<tbody>
+  <tbody>
     {patients.map(p => (
       <tr key={p.id}>
         <td>{p.id}</td>
@@ -338,12 +360,8 @@ return (
         <td>{p.risk_level}</td>
         <td>{p.recommendation}</td>
         <td>
-          <Button
-            variant="outline-danger"
-            size="sm"
-            onClick={() => deletePatient(p.id)}
-          >
-            Eliminar
+          <Button variant="danger" size="sm" onClick={() => deletePatient(p.id)}>
+            Delete
           </Button>
         </td>
       </tr>
@@ -351,8 +369,7 @@ return (
   </tbody>
 </Table>
 </div>
-  </Container>
-  
+</div>  
 );
 
 }
