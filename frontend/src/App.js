@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Container,Card, Form, Button, Table, Alert } from 'react-bootstrap';
-
-
-
+import { Card, Form, Button, Table, Alert } from 'react-bootstrap';
 
 
 function App() {
@@ -145,7 +142,7 @@ const handleSubmit = async (e) => {
     }
   } catch (error) {
     console.error("Login error:", error);
-    setStatusMessage("Error al conectar con el servidor.");
+    setStatusMessage("Error connecting to the server.");
   }
 };
 
@@ -180,15 +177,15 @@ const deletePatient = async (id) => {
       }
     });
     if (response.ok) {
-      setStatusMessage(`Paciente con ID ${id} eliminado`);
+      setStatusMessage(`Patient with ID ${id} eliminado`);
       fetchPatients(); // Recargar lista
     } else {
       const data = await response.json();
       setStatusMessage(`Error al eliminar: ${data.detail}`);
     }
   } catch (error) {
-    console.error("Error al eliminar paciente:", error);
-    setStatusMessage("No se pudo eliminar el paciente.");
+    console.error("Error deleting patient:", error);
+    setStatusMessage("The patient could not be removed.");
   }
 };
 
@@ -196,8 +193,8 @@ const deletePatient = async (id) => {
  //componentes de React-Bootstrap
 return (
   <div className="bg-light min-vh-100 p-4">
-    <div className="container"></div>
-
+    <div className="container">
+  
     <h1 className="mb-4">Health Risk Predictor</h1>
 
     <Alert variant={
@@ -244,15 +241,6 @@ return (
     <Button variant="primary" onClick={handleLogin} className="w-100">
       Login
     </Button>
-
-    {statusMessage && (
-      <Alert
-        className="mt-3"
-        variant={statusMessage.toLowerCase().includes('error') ? 'danger' : 'success'}
-      >
-        {statusMessage}
-      </Alert>
-    )}
   </Card.Body>
 </Card>
     </div>
@@ -261,13 +249,24 @@ return (
   <Card.Body>
     <Card.Title className="mb-4 text-center">Register Patient</Card.Title>
 
+    {/*Status message success login and update patient. */}
+    {statusMessage && (
+      <Alert
+        className="mt-3"
+        variant={statusMessage.toLowerCase().includes('error') ? 'danger' : 'success'}
+      >
+        {statusMessage}
+      </Alert>
+    )}
+
+    {/*Status message prediction. */}
     {prediction && (
       <div className="mt-4">
         <p><strong>Risk Level:</strong> {prediction.risk_level}</p>
         <p><strong>Recommendation:</strong> {prediction.recommendation}</p>
       </div>
     )}
-    
+
     <Form onSubmit={handleSubmit}>
       <Form.Group className="mb-3" controlId="formAge">
         <Form.Label>Age</Form.Label>
@@ -332,7 +331,7 @@ return (
   </Card.Body>
 </Card>
 
-   {/*If the board becomes too long or wide,can make it more manageable. */}
+  {/*If the board becomes too long or wide,can make it more manageable. */}
 <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
 
 <h2 className="mt-5">Registered Patients</h2>
@@ -369,10 +368,11 @@ return (
   </tbody>
 </Table>
 </div>
-</div>  
+</div> 
+</div> 
 );
 
-}
+}// closed of función App
 
 export default App;
 
