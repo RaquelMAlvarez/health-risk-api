@@ -4,7 +4,7 @@ An API built with **FastAPI** to simulate early risk prediction of lung cancer b
 
 This project was developed as a practical backend training aligned with real-world health AI use cases.
 
----
+
 
 ## 🚀 Features
 
@@ -14,7 +14,7 @@ This project was developed as a practical backend training aligned with real-wor
 - Simple backend logic designed for learning and internship preparation.
 - Clean project structure using FastAPI and SQLite.
 
----
+
 
 ## 📦 Tech Stack
 
@@ -25,7 +25,6 @@ This project was developed as a practical backend training aligned with real-wor
 - **SQLite** (optional for persistence)
 - **Git + GitHub** (version control)
 
----
 
 ## ▶️ How to Run Locally
 
@@ -180,4 +179,59 @@ http://127.0.0.1:8000/docs
 Fully functional API with secure authentication and CRUD operations.
 Next step: connect with a React-based frontend.
 
+#feature/frontend-ui
+Summary
+# Health Risk Prediction App
+## 🔧 Backend (FastAPI)
+
+- Ubicación: `/backend`
+- Requisitos: `Python 3.10+`
+- Dependencias:
+  ```bash
+  pip install -r requirements.txt
+
+uvicorn main:app --reload
+
+🌐 Frontend (React + React-Bootstrap)
+Ubicación: /frontend
+
+Installation of dependencies::
+
+bash
+Copy
+Edit
+cd frontend
+npm install
+
+Run the frontend in development mode:
+
+bash
+Copy
+Edit
+npm start
+This open the app en http://localhost:3000
+
+Libraries used:
+
+react-bootstrap
+
+bootstrap
+
+fetch para peticiones HTTP
+
+🚀 Funcionality
+Autenticación (login)
+
+Registre of patient
+
+Predicción of risk
+
+Visualization table patient 
+
+Elimination de registre
+
+Design responsive with React-Bootstrap
+
+
+ main
 
