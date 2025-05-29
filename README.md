@@ -100,6 +100,7 @@ Test /predict-risk or /patients endpoints using Swagger UI.
 
 This API predicts lung cancer risk based on combined genetic, environmental, and lifestyle factors. Built with FastAPI and secured using JWT authentication, it supports full CRUD operations for managing patient data.
 
+
 🚀 Features
 
 Risk prediction based on:
@@ -162,6 +163,9 @@ http://127.0.0.1:8000/docs
 
 - Render: https://healthrisk-api.onrender.com
 - Swagger Docs: https://healthrisk-api.onrender.com/docs
+
+- 🧠 Backend (FastAPI): [API on Render](https://healthrisk-api.onrender.com)
+- 💻 Frontend (React): [App on Render](https://healthriskapi-frontend.onrender.com)
 
 ---
 
